@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쇼핑 내역 조회</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #FFD1DC; /* 파스텔 핑크 배경색 */
+            text-align: center; /* 글자 가운데 정렬 */
+        }
+        table { 
+            width: 80%; /* 테이블 너비 조정 */
+            margin: 20px auto; /* 테이블을 화면 중앙으로 배치 */
+            border-collapse: collapse;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            text-align: center; /* 테이블 글자 가운데 정렬 */
+        }
+        th { 
+            background-color: #f4f4f4; 
+        }
+        input, button { 
+            padding: 10px; 
+            margin: 10px;
+        }
+        .kakao-button { 
+            background-color: #fee500; 
+            color: #000; 
+            border: none; 
+            padding: 5px 10px; 
+            cursor: pointer; 
+            text-decoration: none; 
+            font-weight: bold; 
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>쇼핑 내역 조회</h1>
+    <p>안녕하세요! 이곳에서 쇼핑 내역을 확인하세요.</p>
+    
+    <!-- 이름 입력 -->
+    <input type="text" id="nameInput" placeholder="이름을 입력하세요" />
+    <button onclick="searchOrders()">검색</button>
+
+    <!-- 결과 테이블 -->
+    <table id="orderTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>이름</th>
+                <th>브랜드</th>
+                <th>상품명</th>
+                <th>주문 날짜</th>
+                <th>수량</th>
+                <th>배송 상태</th>
+                <th>출고하기</th>
+            </tr>
+        </thead>
+        <tbody id="orderBody"></tbody>
+    </table>
+
+    <script>
+        function searchOrders() {
+            const name = document.getElementById('nameInput').value;
+
+            // API 호출
+            fetch(`/api/orders?name=${name}`)
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.getElementById('orderTable');
+                    const tbody = document.getElementById('orderBody');
+                    tbody.innerHTML = ""; // 초기화
+
+                    if (data.length > 0) {
+                        table.style.display = "table";
+                        data.forEach(order => {
+                            // 이름 가공: 첫 글자만 표시하고 나머지는 **
+                            const maskedName = order.name.charAt(0) + "**";
+
+                            const row = `
+                                <tr>
+                                    <td>${maskedName}</td> <!-- 이름 -->
+                                    <td>${order.brand}</td> <!-- 브랜드 -->
+                                    <td>${order.productName}</td> <!-- 상품명 -->
+                                    <td>${order.orderDate}</td> <!-- 주문 날짜 -->
+                                    <td>${order.quantity}</td> <!-- 수량 -->
+                                    <td>${order.status}</td> <!-- 배송 상태 -->
+                                    <td>
+                                        <a href="http://pf.kakao.com/_JexbxaG/chat
+" target="_blank" class="kakao-button">
+                                            출고하기
+                                        </a>
+                                    </td>
+                                </tr>
+                            `;
+                            tbody.innerHTML += row;
+                        });
+                    } else {
+                        table.style.display = "none";
+                        alert("해당 이름의 주문 내역이 없습니다.");
+                    }
+                })
+                .catch(error => {
+                    console.error("API 호출 실패:", error);
+                    alert("서버 오류가 발생했습니다.");
+                });
+        }
+    </script>
+</body>
+</html>
