@@ -5,38 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>쇼핑 내역 조회</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 20px; 
-            background-color: #FFD1DC; 
-            text-align: center; 
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #FFD1DC;
+            text-align: center;
         }
-        table { 
-            width: 80%; 
-            margin: 20px auto; 
-            border-collapse: collapse; 
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
         }
-        th, td { 
-            border: 1px solid #ddd; 
-            padding: 8px; 
-            text-align: center; 
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
         }
-        th { 
-            background-color: #f4f4f4; 
+        th {
+            background-color: #f4f4f4;
         }
-        input, button { 
-            padding: 10px; 
+        input, button {
+            padding: 10px;
             margin: 10px;
         }
-        .kakao-button { 
-            background-color: #fee500; 
-            color: #000; 
-            border: none; 
-            padding: 5px 10px; 
-            cursor: pointer; 
-            text-decoration: none; 
-            font-weight: bold; 
+        .kakao-button {
+            background-color: #fee500;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
             border-radius: 5px;
+        }
+        .disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -63,12 +67,12 @@
         </thead>
         <tbody id="orderBody"></tbody>
     </table>
-
+    
     <script>
         function searchOrders() {
             const name = document.getElementById('nameInput').value.trim();
 
-            fetch(`/api/orders?name=${encodeURIComponent(name)}`)
+            fetch(`https://rruttimaket.onrender.com/api/orders?name=${encodeURIComponent(name)}`)
                 .then(response => response.json())
                 .then(data => {
                     const table = document.getElementById('orderTable');
@@ -78,19 +82,19 @@
                     if (data.length > 0) {
                         table.style.display = "table";
                         data.forEach(order => {
-                            const maskedName = order.name.charAt(0) + "**"; // 이름 일부 마스킹
+                            const disabled = order.status === '배송완료' ? 'disabled' : ''; // 배송 완료 상태일 경우 비활성화
                             const row = `
                                 <tr>
-                                    <td>${maskedName}</td>
+                                    <td>${order.name}</td>
                                     <td>${order.brand}</td>
                                     <td>${order.productName}</td>
                                     <td>${order.orderDate}</td>
                                     <td>${order.quantity}</td>
                                     <td>${order.status}</td>
                                     <td>
-                                        <a href="http://pf.kakao.com/_JexbxaG/chat" target="_blank" class="kakao-button">
+                                        <button onclick="updateStatus('${order.name}', '${order.productName}')" class="kakao-button ${disabled}" ${disabled ? 'disabled' : ''}>
                                             출고하기
-                                        </a>
+                                        </button>
                                     </td>
                                 </tr>
                             `;
@@ -103,8 +107,28 @@
                 })
                 .catch(error => {
                     console.error("API 호출 실패:", error);
-                    alert("서버와 통신 중 오류가 발생했습니다.");
+                    alert("서버 오류가 발생했습니다.");
                 });
+        }
+
+        // 출고 상태 업데이트 함수
+        function updateStatus(name, productName) {
+            fetch(`https://rruttimaket.onrender.com/api/updateStatus`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, productName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("출고 완료되었습니다.");
+                searchOrders(); // 상태 업데이트 후 다시 주문 내역을 갱신
+            })
+            .catch(error => {
+                console.error('출고 오류:', error);
+                alert('출고 처리 중 오류가 발생했습니다.');
+            });
         }
     </script>
 </body>
