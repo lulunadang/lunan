@@ -1,9 +1,10 @@
 const path = require('path');
 const xlsx = require('xlsx'); // xlsx 모듈 가져오기
-
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 4000; // Render가 제공하는 PORT 환경 변수 사용
+
+// PORT 설정: Render가 제공하는 PORT 환경 변수를 사용
+const PORT = process.env.PORT || 4000;
 
 // Static 파일 제공 (HTML, CSS 등)
 app.use(express.static('public'));
@@ -37,7 +38,7 @@ app.get('/api/orders', (req, res) => {
     res.json(result); // 결과를 JSON 형식으로 반환
 });
 
-// 서버 실행
+// 서버 실행 (한 번만 호출)
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
