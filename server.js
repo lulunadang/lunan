@@ -34,6 +34,14 @@ if (data.length > 0) {
     console.error("Excel Data is empty or failed to load.");
 }
 
+// Static 파일 제공
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 기본 라우트 처리 (index.html 파일 제공)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // 주문 내역 조회 API
 app.get('/api/orders', (req, res) => {
     const { name } = req.query;
@@ -53,6 +61,7 @@ app.get('/api/orders', (req, res) => {
     }
 });
 
+// 서버 실행
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
