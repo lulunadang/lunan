@@ -34,65 +34,47 @@ function updateOrderStatus(name, status) {
     const sheet = workbook.Sheets[sheetName];
     const data = xlsx.utils.sheet_to_json(sheet);
 
-    // 상태 업데이트
     const updatedData = data.map(order => {
         if (normalizeString(order.name) === normalizeString(name)) {
-            order.status = status; // 주문의 상태를 업데이트
+            order.status = status; // 상태 업데이트
         }
         return order;
     });
 
-    // 업데이트된 데이터를 Excel 파일에 다시 저장
     const newSheet = xlsx.utils.json_to_sheet(updatedData);
     workbook.Sheets[sheetName] = newSheet;
     xlsx.writeFile(workbook, excelFilePath);
 }
 
-// 주문 상태 변경 API
+// API: 주문 상태 변경
 app.post('/api/updateStatus', express.json(), (req, res) => {
     const { name, status } = req.body;
     updateOrderStatus(name, status);
     res.json({ message: '상태가 업데이트되었습니다.' });
 });
 
-// 기본 라우트 및 주문 내역 조회 API
+// Static 파일 및 기본 경로
 app.use(express.static('public'));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// 주문 내역 조회 API
+// API: 주문 조회
 app.get('/api/orders', (req, res) => {
     const { name } = req.query;
     const data = readExcelFile();
 
     if (name) {
-        const normalizedInput = normalizeString(name); // 입력값 정규화
+        const normalizedInput = normalizeString(name);
         const result = data.filter(order =>
-            order.name.includes(normalizedInput) // 이름 포함 여부 확인
+            order.name.includes(normalizedInput)
         );
         res.json(result);
     } else {
-        res.json(data); // name이 없으면 전체 데이터 반환
+        res.json(data);
     }
 });
 
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
-});
-data.forEach(order => {
-    const row = `
-        <tr>
-            <td>${order.name}</td>
-            <td>${order.brand}</td>
-            <td>${order.productName}</td>
-            <td>${order.orderDate}</td>
-            <td>${order.quantity}</td>
-            <td id="status-${order.name}">${order.status}</td>
-            <td>
-                <button onclick="markAsShipped('${order.name}')">출고하기</button>
-            </td>
-        </tr>
-    `;
-    tbody.innerHTML += row;
 });
