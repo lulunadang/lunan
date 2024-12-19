@@ -3,7 +3,7 @@ const path = require('path');
 const xlsx = require('xlsx');
 const app = express();
 
-const PORT = process.env.PORT || 4000; // Render에서 제공하는 PORT 환경 변수 사용
+const PORT = process.env.PORT || 1000; // Render에서 제공하는 PORT 환경 변수 사용
 
 // 엑셀 파일 경로
 const excelFilePath = path.join(__dirname, 'data.xlsx');
