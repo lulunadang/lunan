@@ -1,10 +1,8 @@
-const path = require('path');
-const xlsx = require('xlsx'); // xlsx 모듈 가져오기
 const express = require('express');
+const path = require('path');
+const xlsx = require('xlsx');
 const app = express();
-
-// PORT 설정: Render가 제공하는 PORT 환경 변수를 사용
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4000; // Render가 제공하는 PORT 환경 변수 사용
 
 // Static 파일 제공 (HTML, CSS 등)
 app.use(express.static('public'));
@@ -27,18 +25,18 @@ function readExcelFile() {
 
 // 기본 라우트 - 홈
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html')); // HTML 파일 제공
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // 주문 내역 조회 API
 app.get('/api/orders', (req, res) => {
-    const { name } = req.query; // 쿼리 파라미터에서 name 가져오기
+    const { name } = req.query;
     const data = readExcelFile();
     const result = name ? data.filter(order => order.name === name) : data;
-    res.json(result); // 결과를 JSON 형식으로 반환
+    res.json(result);
 });
 
-// 서버 실행 (한 번만 호출)
+// 서버 실행
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
