@@ -8,18 +8,18 @@
         body { 
             font-family: Arial, sans-serif; 
             margin: 20px; 
-            background-color: #FFD1DC; /* 파스텔 핑크 배경색 */
-            text-align: center; /* 글자 가운데 정렬 */
+            background-color: #FFD1DC; 
+            text-align: center; 
         }
         table { 
-            width: 80%; /* 테이블 너비 조정 */
-            margin: 20px auto; /* 테이블을 화면 중앙으로 배치 */
-            border-collapse: collapse;
+            width: 80%; 
+            margin: 20px auto; 
+            border-collapse: collapse; 
         }
         th, td { 
             border: 1px solid #ddd; 
             padding: 8px; 
-            text-align: center; /* 테이블 글자 가운데 정렬 */
+            text-align: center; 
         }
         th { 
             background-color: #f4f4f4; 
@@ -66,10 +66,9 @@
 
     <script>
         function searchOrders() {
-            const name = document.getElementById('nameInput').value;
+            const name = document.getElementById('nameInput').value.trim();
 
-            // API 호출
-            fetch(`/api/orders?name=${name}`)
+            fetch(`/api/orders?name=${encodeURIComponent(name)}`)
                 .then(response => response.json())
                 .then(data => {
                     const table = document.getElementById('orderTable');
@@ -79,20 +78,17 @@
                     if (data.length > 0) {
                         table.style.display = "table";
                         data.forEach(order => {
-                            // 이름 가공: 첫 글자만 표시하고 나머지는 **
-                            const maskedName = order.name.charAt(0) + "**";
-
+                            const maskedName = order.name.charAt(0) + "**"; // 이름 일부 마스킹
                             const row = `
                                 <tr>
-                                    <td>${maskedName}</td> <!-- 이름 -->
-                                    <td>${order.brand}</td> <!-- 브랜드 -->
-                                    <td>${order.productName}</td> <!-- 상품명 -->
-                                    <td>${order.orderDate}</td> <!-- 주문 날짜 -->
-                                    <td>${order.quantity}</td> <!-- 수량 -->
-                                    <td>${order.status}</td> <!-- 배송 상태 -->
+                                    <td>${maskedName}</td>
+                                    <td>${order.brand}</td>
+                                    <td>${order.productName}</td>
+                                    <td>${order.orderDate}</td>
+                                    <td>${order.quantity}</td>
+                                    <td>${order.status}</td>
                                     <td>
-                                        <a href="http://pf.kakao.com/_JexbxaG/chat
-" target="_blank" class="kakao-button">
+                                        <a href="http://pf.kakao.com/_JexbxaG/chat" target="_blank" class="kakao-button">
                                             출고하기
                                         </a>
                                     </td>
@@ -107,11 +103,9 @@
                 })
                 .catch(error => {
                     console.error("API 호출 실패:", error);
-                    alert("서버 오류가 발생했습니다.");
+                    alert("서버와 통신 중 오류가 발생했습니다.");
                 });
         }
     </script>
 </body>
 </html>
-
-
