@@ -80,3 +80,19 @@ app.get('/api/orders', (req, res) => {
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
+data.forEach(order => {
+    const row = `
+        <tr>
+            <td>${order.name}</td>
+            <td>${order.brand}</td>
+            <td>${order.productName}</td>
+            <td>${order.orderDate}</td>
+            <td>${order.quantity}</td>
+            <td id="status-${order.name}">${order.status}</td>
+            <td>
+                <button onclick="markAsShipped('${order.name}')">출고하기</button>
+            </td>
+        </tr>
+    `;
+    tbody.innerHTML += row;
+});
