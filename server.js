@@ -36,8 +36,7 @@ app.get('/api/orders', (req, res) => {
     res.json(result);
 });
 
-// 서버 실행
+// 서버 실행 (단일 app.listen 호출)
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
-console.log(`✅ Server is attempting to bind on port ${PORT}`);
