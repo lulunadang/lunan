@@ -1,87 +1,16 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>쇼핑 내역 조회</title>
-    <style>
-        body { background-color: #FFD1DC; text-align: center; font-family: Arial; }
-        table { margin: 20px auto; border-collapse: collapse; width: 80%; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
-        button { padding: 5px 10px; background-color: #ffc107; border: none; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <h1>쇼핑 내역 조회</h1>
-    <input type="text" id="nameInput" placeholder="이름을 입력하세요" />
-    <button onclick="searchOrders()">검색</button>
-
-    <table id="orderTable" style="display: none;">
-        <thead>
-            <tr>
-                <th>이름</th>
-                <th>브랜드</th>
-                <th>상품명</th>
-                <th>주문 날짜</th>
-                <th>수량</th>
-                <th>배송 상태</th>
-                <th>출고하기</th>
-            </tr>
-        </thead>
-        <tbody id="orderBody"></tbody>
-    </table>
-
-    <script>
-        function searchOrders() {
-            const name = document.getElementById('nameInput').value.trim();
-            fetch(`/api/orders?name=${encodeURIComponent(name)}`)
-                .then(response => response.json())
-                .then(data => {
-                    const table = document.getElementById('orderTable');
-                    const tbody = document.getElementById('orderBody');
-                    tbody.innerHTML = "";
-
-                    if (data.length > 0) {
-                        table.style.display = "table";
-                        data.forEach(order => {
-                            const row = `
-                                <tr>
-                                    <td>${order.name}</td>
-                                    <td>${order.brand}</td>
-                                    <td>${order.productName}</td>
-                                    <td>${order.orderDate}</td>
-                                    <td>${order.quantity}</td>
-                                    <td id="status-${order.name}">${order.status}</td>
-                                    <td>
-                                        <button onclick="markAsShipped('${order.name}')">출고하기</button>
-                                    </td>
-                                </tr>
-                            `;
-                            tbody.innerHTML += row;
-                        });
-                    } else {
-                        table.style.display = "none";
-                        alert("해당 이름의 주문 내역이 없습니다.");
-                    }
-                })
-                .catch(error => alert("서버 오류가 발생했습니다."));
-        }
-
-        function markAsShipped(name) {
-            const statusElement = document.getElementById(`status-${name}`);
-            if (statusElement) {
-                statusElement.textContent = "배송 완료";
-                statusElement.style.color = "green";
-
-                fetch(`/api/updateStatus`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: name, status: '배송 완료' })
-                }).then(response => response.json())
-                  .then(data => console.log(data))
-                  .catch(error => console.error("서버 오류:", error));
-            }
-        }
-    </script>
-</body>
-</html>
+{
+  "name": "shopping-app",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "xlsx": "^0.18.5"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "license": "MIT"
+}
