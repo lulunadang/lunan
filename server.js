@@ -3,7 +3,7 @@ const path = require('path');
 const xlsx = require('xlsx');
 const app = express();
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4000; // Render에서 제공하는 PORT 환경 변수 사용
 
 // 엑셀 파일 경로
 const excelFilePath = path.join(__dirname, 'data.xlsx');
@@ -37,7 +37,7 @@ app.get('/api/orders', (req, res) => {
     res.json(result);
 });
 
-// 서버 실행 (중복 제거)
+// 서버 실행
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
     console.log(`PORT from environment: ${process.env.PORT}`);
