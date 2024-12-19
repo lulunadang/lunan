@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>쇼핑 내역 조회</title>
+    <title>루띠마켓 남대문 아동복 라방주문내역</title>
     <style>
         body { background-color: #FFD1DC; text-align: center; font-family: Arial; }
         table { margin: 20px auto; border-collapse: collapse; width: 80%; }
@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-    <h1>쇼핑 내역 조회</h1>
+    <h1>루띠마켓 남대문 아동복 라방주문내역</h1>
     <input type="text" id="nameInput" placeholder="이름을 입력하세요" />
     <button onclick="searchOrders()">검색</button>
 
@@ -77,10 +77,9 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: name, status: '배송 중' })
-                })
-                .then(response => response.json())
-                .then(data => console.log(data))
-                .catch(error => console.error("서버 오류:", error));
+                }).then(response => response.json())
+                  .then(data => console.log(data))
+                  .catch(error => console.error("서버 오류:", error));
             }
         }
     </script>
