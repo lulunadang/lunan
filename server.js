@@ -3,7 +3,7 @@ const path = require('path');
 const xlsx = require('xlsx');
 const app = express();
 
-const PORT = process.env.PORT || 1000; // Render에서 제공하는 PORT 환경 변수 사용
+const PORT = process.env.PORT || 3000; // Render에서 제공하는 PORT 환경 변수 사용
 
 // 엑셀 파일 경로
 const excelFilePath = path.join(__dirname, 'data.xlsx');
@@ -43,17 +43,13 @@ app.get('/', (req, res) => {
 // 주문 내역 조회 API
 app.get('/api/orders', (req, res) => {
     const { name } = req.query;
-    const data = readExcelFile();
+    const data = readExcelFile(); // 매 요청마다 엑셀 파일 읽기
 
     if (name) {
         const normalizedInput = normalizeString(name); // 입력값 정규화
-        console.log("Normalized Request Name:", normalizedInput);
-
         const result = data.filter(order =>
             order.name.includes(normalizedInput) // 이름 포함 여부 확인
         );
-
-        console.log("Filtered Data:", result);
         res.json(result);
     } else {
         res.json(data); // name이 없으면 전체 데이터 반환
@@ -65,7 +61,3 @@ app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
     console.log(`PORT from environment: ${process.env.PORT}`);
 });
-
-// 엑셀 데이터 확인 로그
-const data = readExcelFile();
-console.log("Excel Data:", data); // 서버 실행 시 엑셀 데이터 출력
