@@ -65,3 +65,7 @@ app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
     console.log(`PORT from environment: ${process.env.PORT}`);
 });
+
+// 엑셀 데이터 확인 로그
+const data = readExcelFile();
+console.log("Excel Data:", data); // 서버 실행 시 엑셀 데이터 출력
