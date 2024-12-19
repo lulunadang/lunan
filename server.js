@@ -41,3 +41,5 @@ app.get('/api/orders', (req, res) => {
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
+
+console.log(`PORT from environment: ${process.env.PORT}`);
