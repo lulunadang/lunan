@@ -85,6 +85,20 @@
             margin: 20px auto;
             text-align: center;
         }
+
+        #shipSelected {
+            padding: 10px 20px;
+            background-color: #FFD6DD;
+            border: 2px solid #FFB3C4;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'GamjaFlower', Arial, sans-serif;
+        }
+
+        #shipSelected:hover {
+            background-color: #FFB3C4;
+        }
     </style>
 </head>
 <body>
@@ -116,19 +130,12 @@
     </table>
 
     <div class="center-button" style="display: none;" id="shipSelectedContainer">
-        <a href=" http://pf.kakao.com/_JexbxaG"
+        <a href="http://pf.kakao.com/_JexbxaG/chat" target="_blank">
             <button id="shipSelected">출고 요청</button>
         </a>
     </div>
 
     <script>
-        function maskName(name) {
-            // 이름에서 특정 자리 유지 (예: 첫 글자와 3번째 문자)
-            return name.split('').map((char, index) =>
-                index === 0 || index === 3 ? char : '*'
-            ).join('');
-        }
-
         function searchOrders() {
             const name = document.getElementById('nameInput').value.trim();
             fetch(`/api/orders?name=${encodeURIComponent(name)}`)
