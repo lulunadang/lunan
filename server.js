@@ -10,7 +10,27 @@ const excelFilePath = path.join(__dirname, 'data.xlsx');
 
 // 문자열 정규화 함수
 function normalizeString(str) {
-    return str ? str.trim().toLowerCase().replace(/[^a-zA-Z가-힣0-9]/g, '').replace(/\s+/g, '') : '';
+    return str ? str.trim().toLowerCase().replace(/[^a-zA-Z가-힣0-9_]/g, '').replace(/\s+/g, '') : '';
+}
+
+// 이름 마스킹 함수
+function maskName(name) {
+    return name.split('').map((char, index) =>
+        index === 0 || index === 3 || char === '_' ? char : '*'
+    ).join('');
+}
+
+// 날짜 포맷 변환 함수
+function formatDate(excelDate) {
+    const baseDate = new Date(1899, 11, 30); // Excel 날짜 기준
+    const daysOffset = Math.floor(excelDate);
+    const date = new Date(baseDate.getTime() + daysOffset * 24 * 60 * 60 * 1000);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
 }
 
 // 엑셀 데이터 읽기 함수
@@ -26,8 +46,13 @@ function readExcelFile() {
     }
 }
 
-// 데이터를 로드
-const data = readExcelFile();
+// 데이터를 로드 및 이름 마스킹 처리
+const data = readExcelFile().map(order => ({
+    ...order,
+    maskedName: maskName(order.name), // 이름 마스킹 추가
+    입고날짜: formatDate(order.orderDate) // 입고 날짜 포맷 추가
+}));
+
 if (data.length > 0) {
     console.log("Excel Data Loaded Successfully:", data);
 } else {
@@ -54,10 +79,19 @@ app.get('/api/orders', (req, res) => {
         const normalizedInput = normalizeString(name);
         const result = data.filter(order =>
             normalizeString(order.name).includes(normalizedInput)
-        );
+        ).map(order => ({
+            ...order,
+            name: maskName(order.name), // API 응답에서 이름 마스킹
+            입고날짜: order.입고날짜 // 포맷된 입고 날짜
+        }));
         res.json(result);
     } else {
-        res.json(data);
+        const maskedData = data.map(order => ({
+            ...order,
+            name: maskName(order.name), // 전체 데이터 마스킹
+            입고날짜: order.입고날짜 // 포맷된 입고 날짜
+        }));
+        res.json(maskedData);
     }
 });
 

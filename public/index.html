@@ -4,34 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>루띠마켓 남대문 아동복 라방주문내역</title>
+
     <style>
-        body { background-color: #FFD1DC; text-align: center; font-family: Arial; }
-        table { margin: 20px auto; border-collapse: collapse; width: 80%; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
-        button { padding: 5px 10px; background-color: #ffc107; border: none; cursor: pointer; }
+        @font-face {
+            font-family: 'GamjaFlower';
+            src: url('/fonts/GamjaFlower-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            background-color: #FFE4E9;
+            text-align: center;
+            font-family: 'GamjaFlower', Arial, sans-serif;
+        }
+
+        .notice {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #FFE4E9;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            width: 80%;
+            font-size: 16px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            height: 40px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #bbb;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #FFD6DD;
+            border: 2px solid #FFB3C4;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'GamjaFlower', Arial, sans-serif;
+        }
+
+        button:hover {
+            background-color: #FFB3C4;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+            font-family: 'GamjaFlower', Arial, sans-serif;
+            border: 3px solid #FF6584;
+        }
+
+        th, td {
+            padding: 15px;
+            border: 2px solid #FF6584;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #FFD6DD;
+            font-weight: bold;
+            color: #333;
+        }
+
+        td {
+            background-color: #FFF;
+        }
+
+        .center-button {
+            margin: 20px auto;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <h1>루띠마켓 남대문 아동복 라방주문내역</h1>
-    <input type="text" id="nameInput" placeholder="이름을 입력하세요" />
+    <div class="notice">
+        구매하신 제품 입고 여부 또는 출고는 아래 인스타아이디 조회 시 오타 없이 적어주셔야 조회 가능합니다.<br>
+        출고를 원하시면 체크해주시고 출고 요청해주세요!<br>
+        출고요청을 누르시면 입고분에한에 10만원이상 구매시
+        1회성으로 무료배송도와드립니다<br>
+        리오더로인해 킵되어있는 토탈제품들이 80%
+        이상입고시 또 선발송도와드립니다.<br>
+        급하게 받으셔야 하는 상황이시라면 배송비 3,000원을 별도로 입금해주시고 출고 요청 주시면 됩니다!
+    </div>
+    <input type="text" id="nameInput" placeholder="인스타아이디를 입력하세요" />
     <button onclick="searchOrders()">검색</button>
 
     <table id="orderTable" style="display: none;">
         <thead>
             <tr>
+                <th>선택</th>
                 <th>이름</th>
                 <th>브랜드</th>
                 <th>상품명</th>
-                <th>주문 날짜</th>
-                <th>수량</th>
+                <th>입고 날짜</th>
                 <th>배송 상태</th>
-                <th>출고하기</th>
             </tr>
         </thead>
         <tbody id="orderBody"></tbody>
     </table>
 
+    <div class="center-button" style="display: none;" id="shipSelectedContainer">
+        <a href="http://pf.kakao.com/_JexbxaG/chat" target="_blank">
+            <button id="shipSelected">출고 요청</button>
+        </a>
+    </div>
+
     <script>
+        function maskName(name) {
+            // 이름에서 특정 자리 유지 (예: 첫 글자와 3번째 문자)
+            return name.split('').map((char, index) =>
+                index === 0 || index === 3 ? char : '*'
+            ).join('');
+        }
+
         function searchOrders() {
             const name = document.getElementById('nameInput').value.trim();
             fetch(`/api/orders?name=${encodeURIComponent(name)}`)
@@ -39,48 +136,33 @@
                 .then(data => {
                     const table = document.getElementById('orderTable');
                     const tbody = document.getElementById('orderBody');
+                    const shipButtonContainer = document.getElementById('shipSelectedContainer');
                     tbody.innerHTML = "";
 
                     if (data.length > 0) {
                         table.style.display = "table";
+                        shipButtonContainer.style.display = "block";
                         data.forEach(order => {
+                            const maskedName = maskName(order.name);
                             const row = `
                                 <tr>
-                                    <td>${order.name}</td>
+                                    <td><input type="checkbox" data-name="${order.name}" /></td>
+                                    <td>${maskedName}</td>
                                     <td>${order.brand}</td>
                                     <td>${order.productName}</td>
                                     <td>${order.orderDate}</td>
-                                    <td>${order.quantity}</td>
-                                    <td id="status-${order.name}">${order.status}</td>
-                                    <td>
-                                        <button onclick="markAsShipped('${order.name}')">출고하기</button>
-                                    </td>
+                                    <td>${order.status}</td>
                                 </tr>
                             `;
                             tbody.innerHTML += row;
                         });
                     } else {
                         table.style.display = "none";
+                        shipButtonContainer.style.display = "none";
                         alert("해당 이름의 주문 내역이 없습니다.");
                     }
                 })
                 .catch(error => alert("서버 오류가 발생했습니다."));
-        }
-
-        function markAsShipped(name) {
-            const statusElement = document.getElementById(`status-${name}`);
-            if (statusElement) {
-                statusElement.textContent = "배송 중";
-                statusElement.style.color = "green";
-
-                fetch(`/api/updateStatus`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: name, status: '배송 중' })
-                }).then(response => response.json())
-                  .then(data => console.log(data))
-                  .catch(error => console.error("서버 오류:", error));
-            }
         }
     </script>
 </body>
