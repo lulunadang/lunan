@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const xlsx = require('xlsx');
+const fs = require('fs');
 const app = express();
 
 const PORT = process.env.PORT || 1000;
@@ -33,17 +34,34 @@ function formatDate(excelDate) {
     return `${year}-${month}-${day}`;
 }
 
-// 엑셀 데이터 읽기
+// 엑셀 데이터 읽기 함수
 function readExcelFile() {
-    const workbook = xlsx.readFile(excelFilePath);
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    return xlsx.utils.sheet_to_json(sheet).map(order => ({
-        ...order,
-        maskedName: maskName(order.name),
-        입고날짜: formatDate(order.orderDate)
-    }));
+    try {
+        console.log("엑셀 파일 경로:", excelFilePath);
+        const workbook = xlsx.readFile(excelFilePath);
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const data = xlsx.utils.sheet_to_json(sheet).map(order => ({
+            ...order,
+            maskedName: maskName(order.name),
+            입고날짜: formatDate(order.orderDate)
+        }));
+        console.log("엑셀 데이터 로드 성공:", data);
+        return data;
+    } catch (error) {
+        console.error("엑셀 파일 읽기 오류:", error.message);
+        return [];
+    }
 }
+
+// 파일 접근 확인
+fs.access(excelFilePath, fs.constants.R_OK, (err) => {
+    if (err) {
+        console.error(`파일 접근 오류: ${err.message}`);
+    } else {
+        console.log("data.xlsx 파일에 접근할 수 있습니다.");
+    }
+});
 
 // 데이터 로드
 let data = readExcelFile();
@@ -53,16 +71,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // 주문 내역 조회 API
 app.get('/api/orders', (req, res) => {
-    const { name } = req.query;
-
-    if (name) {
-        const normalizedInput = normalizeString(name);
-        const result = data.filter(order =>
-            normalizeString(order.name).includes(normalizedInput)
-        );
-        res.json(result);
-    } else {
-        res.json(data);
+    try {
+        const { name } = req.query;
+        if (name) {
+            const normalizedInput = normalizeString(name);
+            const result = data.filter(order =>
+                normalizeString(order.name).includes(normalizedInput)
+            );
+            res.json(result);
+        } else {
+            res.json(data);
+        }
+    } catch (error) {
+        console.error("Error in /api/orders:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
@@ -70,4 +92,5 @@ app.get('/api/orders', (req, res) => {
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
-console.log("엑셀 데이터:", readExcelFile());
+
+console.log(`✅ Server is running on http://localhost:${PORT}`);

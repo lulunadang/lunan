@@ -18,3 +18,14 @@ th, td {
     border: 1px solid #ddd;
     text-align: center;
 }
+
+@font-face {
+    font-family: 'GamjaFlower';
+    src: url('/fonts/GamjaFlower-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'GamjaFlower', Arial, sans-serif;
+}
