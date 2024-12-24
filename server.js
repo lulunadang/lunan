@@ -23,15 +23,28 @@ function maskName(name) {
 
 // 날짜 포맷 변환 함수
 function formatDate(excelDate) {
-    const baseDate = new Date(1899, 11, 30);
-    const daysOffset = Math.floor(excelDate);
-    const date = new Date(baseDate.getTime() + daysOffset * 24 * 60 * 60 * 1000);
+    if (typeof excelDate === 'number') {
+        // 엑셀 날짜를 변환
+        const baseDate = new Date(1899, 11, 30);
+        const daysOffset = Math.floor(excelDate);
+        const date = new Date(baseDate.getTime() + daysOffset * 24 * 60 * 60 * 1000);
 
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
 
-    return `${year}-${month}-${day}`;
+        return `${year}-${month}-${day}`;
+    } else if (typeof excelDate === 'string') {
+        try {
+            const parsedDate = new Date(excelDate);
+            if (!isNaN(parsedDate)) {
+                return parsedDate.toISOString().split('T')[0];
+            }
+        } catch {
+            return '날짜 오류';
+        }
+    }
+    return '날짜 없음';
 }
 
 // 엑셀 데이터 읽기 함수
@@ -41,12 +54,15 @@ function readExcelFile() {
         const workbook = xlsx.readFile(excelFilePath);
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-        const data = xlsx.utils.sheet_to_json(sheet).map(order => ({
+        const rawData = xlsx.utils.sheet_to_json(sheet);
+        console.log("엑셀 원본 데이터:", rawData);
+
+        const data = rawData.map(order => ({
             ...order,
-            maskedName: maskName(order.name),
+            maskedName: maskName(order.name || ''),
             입고날짜: formatDate(order.orderDate)
         }));
-        console.log("엑셀 데이터 로드 성공:", data);
+        console.log("처리된 데이터:", data);
         return data;
     } catch (error) {
         console.error("엑셀 파일 읽기 오류:", error.message);
@@ -76,7 +92,7 @@ app.get('/api/orders', (req, res) => {
         if (name) {
             const normalizedInput = normalizeString(name);
             const result = data.filter(order =>
-                normalizeString(order.name).includes(normalizedInput)
+                normalizeString(order.name || '').includes(normalizedInput)
             );
             res.json(result);
         } else {
@@ -92,5 +108,3 @@ app.get('/api/orders', (req, res) => {
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
-
-console.log(`✅ Server is running on http://localhost:${PORT}`);
