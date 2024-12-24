@@ -2,9 +2,13 @@ const express = require('express');
 const path = require('path');
 const xlsx = require('xlsx');
 const fs = require('fs');
+const cors = require('cors'); // CORS 모듈 추가
 const app = express();
 
 const PORT = process.env.PORT || 1000;
+
+// CORS 설정 추가 (반드시 다른 app.use 호출 전에 추가)
+app.use(cors());
 
 // 엑셀 파일 경로
 const excelFilePath = path.join(__dirname, 'data.xlsx');
@@ -24,7 +28,6 @@ function maskName(name) {
 // 날짜 포맷 변환 함수
 function formatDate(excelDate) {
     if (typeof excelDate === 'number') {
-        // 엑셀 날짜를 변환
         const baseDate = new Date(1899, 11, 30);
         const daysOffset = Math.floor(excelDate);
         const date = new Date(baseDate.getTime() + daysOffset * 24 * 60 * 60 * 1000);
