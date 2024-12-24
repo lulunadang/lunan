@@ -22,7 +22,7 @@ function maskName(name) {
 
 // 날짜 포맷 변환 함수
 function formatDate(excelDate) {
-    const baseDate = new Date(1899, 11, 30); // Excel 날짜 기준
+    const baseDate = new Date(1899, 11, 30);
     const daysOffset = Math.floor(excelDate);
     const date = new Date(baseDate.getTime() + daysOffset * 24 * 60 * 60 * 1000);
 
@@ -49,8 +49,8 @@ function readExcelFile() {
 // 데이터를 로드 및 이름 마스킹 처리
 const data = readExcelFile().map(order => ({
     ...order,
-    maskedName: maskName(order.name), // 이름 마스킹 추가
-    입고날짜: formatDate(order.orderDate) // 입고 날짜 포맷 추가
+    maskedName: maskName(order.name),
+    입고날짜: formatDate(order.orderDate)
 }));
 
 if (data.length > 0) {
@@ -62,7 +62,7 @@ if (data.length > 0) {
 // Static 파일 제공
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 기본 라우트 처리 (index.html 파일 제공)
+// 기본 라우트 처리
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -81,15 +81,15 @@ app.get('/api/orders', (req, res) => {
             normalizeString(order.name).includes(normalizedInput)
         ).map(order => ({
             ...order,
-            name: maskName(order.name), // API 응답에서 이름 마스킹
-            입고날짜: order.입고날짜 // 포맷된 입고 날짜
+            name: maskName(order.name),
+            입고날짜: order.입고날짜
         }));
         res.json(result);
     } else {
         const maskedData = data.map(order => ({
             ...order,
-            name: maskName(order.name), // 전체 데이터 마스킹
-            입고날짜: order.입고날짜 // 포맷된 입고 날짜
+            name: maskName(order.name),
+            입고날짜: order.입고날짜
         }));
         res.json(maskedData);
     }
