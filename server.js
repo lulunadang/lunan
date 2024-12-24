@@ -5,7 +5,7 @@ const fs = require('fs');
 const cors = require('cors'); // CORS 모듈 추가
 const app = express();
 
-const PORT = process.env.PORT || 1000;
+const PORT = process.env.PORT || 3000;
 
 // CORS 설정 추가 (반드시 다른 app.use 호출 전에 추가)
 app.use(cors());
